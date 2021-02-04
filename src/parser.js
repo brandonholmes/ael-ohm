@@ -8,17 +8,22 @@ import * as ast from "./ast.js"
 
 const aelGrammar = ohm.grammar(String.raw`Ael {
   Program   = Statement+
-  Statement = let id "=" Exp                  --variable
-            | id "=" Exp                      --assign
-            | print Exp                       --print
+  Statement = let id "=" Equ                  --variable
+            | id "=" Equ                      --assign
+            | print Equ                       --print
+  Equ       = Equ "==" Exp                    --binary
+            | Exp
   Exp       = Exp ("+" | "-") Term            --binary
             | Term
-  Term      = Term ("*"| "/") Factor          --binary
+  Term      = Term ("*"| "/" | "%") Factor    --binary
             | Factor
-  Factor    = id
+  Factor    = ("-" | abs | sqrt) Expo        --unary
+            | Expo
+  Expo      = Ending "**" Expo                --binary
+            | Ending
+  Ending    = id
             | num
             | "(" Exp ")"                     --parens
-            | ("-" | abs | sqrt) Factor       --unary
   num       = digit+ ("." digit+)?
   let       = "let" ~alnum
   print     = "print" ~alnum
@@ -48,13 +53,19 @@ const astBuilder = aelGrammar.createSemantics().addOperation("ast", {
   Exp_binary(left, op, right) {
     return new ast.BinaryExpression(op.sourceString, left.ast(), right.ast())
   },
+  Equ_binary(left, op, right) {
+    return new ast.BinaryExpression(op.sourceString, left.ast(), right.ast())
+  },
   Term_binary(left, op, right) {
     return new ast.BinaryExpression(op.sourceString, left.ast(), right.ast())
   },
   Factor_unary(op, operand) {
     return new ast.UnaryExpression(op.sourceString, operand.ast())
   },
-  Factor_parens(_open, expression, _close) {
+  Expo_binary(left, op, right) {
+    return new ast.BinaryExpression(op.sourceString, left.ast(), right.ast())
+  },
+  Ending_parens(_open, expression, _close) {
     return expression.ast()
   },
   num(_whole, _point, _fraction) {

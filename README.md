@@ -32,17 +32,17 @@ Ael {
             | print Equ                       --print
   Equ       = Equ "==" Exp                    --binary
   	    | Exp
-  Exp       = Exp ("+" | "-" | "%") Term      --binary
+  Exp       = Exp ("+" | "-") Term            --binary
             | Term
-  Term      = Term ("*" | "/") Factor         --binary
+  Term      = Term ("*" | "/" | "%") Factor   --binary
             | Factor
-  Factor    = "-"? Expo                       --unary
-  Expo      = Expo "**" Ending                --binary
+  Factor    = ("-" | abs | sqrt) Expo         --unary
+            | Expo
+  Expo      = Ending "**" Expo                --binary
             | Ending
   Ending    = id
             | num
             | "("Exp ")"                      --parens
-            | (abs | sqrt) Ending             --unary
   num       = digit+ ("." digit+)?
   let       = "let" ~alnum
   print     = "print" ~alnum
