@@ -3,8 +3,8 @@ import util from "util"
 import parse from "../src/parser.js"
 
 const source = `let dozen = 1 * (0 + sqrt 101.3)
-  let y = dozen - 0    // TADA 🥑
-  dozen = 0 / y
+  let y = dozen == 0    // TADA 🥑
+  dozen = 0 ** y
   print abs dozen //`
 
 const expectedAst = `   1 | Program statements=[$2,$9,$13,$18]
@@ -16,12 +16,12 @@ const expectedAst = `   1 | Program statements=[$2,$9,$13,$18]
    7 | UnaryExpression op='sqrt' operand=$8
    8 | Literal value=101.3
    9 | Variable name='y' initializer=$10
-  10 | BinaryExpression op='-' left=$11 right=$12
+  10 | BinaryExpression op='==' left=$11 right=$12
   11 | IdentifierExpression name='dozen'
   12 | Literal value=0
   13 | Assignment target=$14 source=$15
   14 | IdentifierExpression name='dozen'
-  15 | BinaryExpression op='/' left=$16 right=$17
+  15 | BinaryExpression op='**' left=$16 right=$17
   16 | Literal value=0
   17 | IdentifierExpression name='y'
   18 | PrintStatement argument=$19
